@@ -1,11 +1,27 @@
 #!/usr/bin/env perl
 use strict; use warnings;
 use Mojolicious::Lite;
+use GraphQL::Schema;
+use GraphQL::Type::Object;
+use GraphQL::Type::Scalar qw/ $String /;
 
 get '/' => sub {
   my $c = shift;
   $c->render(template => 'index');
 };
+
+my $schema = GraphQL::Schema->new(
+    query => GraphQL::Type::Object->new(
+        name => 'QueryRoot',
+        fields => {
+            helloWorld => {
+                type => $String,
+                resolve => sub { 'Hello, world!' },
+            },
+        },
+    ),
+);
+plugin GraphQL => {schema => $schema, graphiql => 1};
 
 app->start;
 __DATA__
