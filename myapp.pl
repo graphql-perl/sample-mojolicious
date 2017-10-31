@@ -1,5 +1,4 @@
 #!/usr/bin/env perl
-use strict; use warnings;
 use Mojolicious::Lite;
 use GraphQL::Schema;
 
@@ -9,10 +8,7 @@ get '/' => sub {
 };
 
 my $schema = GraphQL::Schema->from_doc(<<'EOF');
-schema {
-  query: QueryRoot
-}
-type QueryRoot {
+type Query {
   helloWorld: String
 }
 EOF
