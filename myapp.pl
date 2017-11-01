@@ -1,20 +1,13 @@
 #!/usr/bin/env perl
 use Mojolicious::Lite;
-use GraphQL::Schema;
 
 get '/' => sub {
   my $c = shift;
   $c->render(template => 'index');
 };
 
-my $schema = GraphQL::Schema->from_doc(<<'EOF');
-type Query {
-  helloWorld: String
-}
-EOF
 plugin GraphQL => {
-  schema => $schema,
-  root_value => { helloWorld => 'Hello, world!' },
+  convert => [ 'Test' ],
   graphiql => 1,
 };
 
