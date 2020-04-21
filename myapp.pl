@@ -7,7 +7,24 @@ get '/' => sub {
 };
 
 plugin GraphQL => {
-  convert => [ 'Test' ],
+  convert => [
+    'Test',
+    sub {
+      my $text = $_[1]->{s};
+      my $count = 0;
+      require GraphQL::AsyncIterator;
+      my $ai = GraphQL::AsyncIterator->new(
+        promise_code => Mojolicious::Plugin::GraphQL->promise_code,
+      );
+      my $id;
+      $id = Mojo::IOLoop->recurring(1 => sub {
+        $count++;
+        eval { $ai->publish({ timedEcho => "$text $count" }) };
+        Mojo::IOLoop->remove($id), $ai->close_tap if $@;
+      });
+      $ai;
+    },
+  ],
   graphiql => 1,
 };
 
@@ -26,10 +43,12 @@ __DATA__
   <div id="content">
     <h1>Perl GraphQL Mojolicious Demo App</h1>
     <p>This demonstrates use of GraphQL in a Mojolicious::Lite app.</p>
-    <p>The schema has one field: <code>helloWorld</code>.</p>
+    <p>The schema has one query field: <code>helloWorld</code>.</p>
+    <p>The schema has one mutation field: <code>echo</code>, which takes a parameter <code>s</code>.</p>
+    <p>The schema has one subscription field: <code>timedEcho</code>, which takes a parameter <code>s</code>.</p>
     <p>The frontend uses the GraphiQL tool to query the Perl GraphQL backend.</p>
     <p>To use the demo, type:</p>
-    <p><code>{helloWorld}</code></p>
+    <p><code>subscription s {timedEcho(s: "there")}</code></p>
     <p>in the left hand pane in GraphiQL, then run your query using the button at the top.</p>
     <p>Results are displayed in the pane to the right.</p>
     <h2>Click to <%= link_to 'enter GraphiQL' => '/graphql' %>.</h2>

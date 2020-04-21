@@ -1,7 +1,10 @@
 ## Mojolicious sample app
 
 This is a trivial "hello, world" demonstration of using Mojolicious
-to serve GraphQL.
+to serve GraphQL, using
+[GraphQL::Plugin::Convert::Test](https://metacpan.org/pod/GraphQL::Plugin::Convert::Test)
+to make a schema. If using a recent enough version of the libraries,
+the schema will include a working subscription.
 
 ### To use:
 
