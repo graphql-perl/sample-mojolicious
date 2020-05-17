@@ -17,11 +17,10 @@ subtest 'GraphiQL' => sub {
 };
 
 subtest 'GraphQL with POST' => sub {
-  $t->post_ok('/graphql', { Content_Type => 'application/json' },
-    '{"query":"{helloWorld}"}',
-  )->json_is(
-    { 'data' => { 'helloWorld' => 'Hello, world!' } },
-  );
+  $t->post_ok('/graphql', json => { query => '{helloWorld}' })
+    ->json_is({ 'data' => { 'helloWorld' => 'Hello, world!' } })
+    ->or(sub { diag explain $t->tx->res->body })
+    ;
 };
 
 done_testing;
