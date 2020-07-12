@@ -149,7 +149,12 @@ html, body {
 <body>
   <div id="page">
     <div id="content">
-    <h1>Chat Demo '<%= $username %>' on channel '<%= $channel %>'</h1>
+    <h1>
+      Chat Demo
+      '<span id=username><%= $username %></span>'
+      on channel
+      '<span id=channel><%= $channel %></span>'
+    </h1>
     <div class="row">
       <div class="column" id='chat-panel' style="background-color:#bbb; overflow: auto; max-height: 400px">
       </div>
@@ -162,9 +167,12 @@ html, body {
     </div>
     </div>
   </div>
-<script>
-var username = '<%= $username %>';
-var channel  = '<%= $channel %>';
+  <script src="chat.js"></script>
+</html>
+
+@@ chat.js
+var username = document.getElementById("username").innerHTML;
+var channel  = document.getElementById("channel").innerHTML;
 function send_message_graphql(msg) {
   fetch( '/graphql?', {
     "headers": {
@@ -178,7 +186,6 @@ function send_message_graphql(msg) {
   });
 }
 send_message_graphql(username + ' has joined');
-
 // WEBSOCKET
 var ws = null;
 if ("WebSocket" in window) {
@@ -195,7 +202,6 @@ if ("WebSocket" in window) {
    var chatPanel = document.getElementById("chat-panel");
    try {
      var p_message_json = JSON.parse( event.data );
-
      var message_json = p_message_json.payload.data.subscribe;
      if (message_json.message )
      {
@@ -229,5 +235,3 @@ if ("WebSocket" in window) {
 function send_message() { // called when button pressed
   send_message_graphql( document.getElementById("chat-text").value  );
 }
-</script>
-</html>
