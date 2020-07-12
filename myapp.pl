@@ -198,7 +198,6 @@ if ("WebSocket" in window) {
   new_uri += "//" + loc.host + "/graphql";
   ws = new WebSocket( new_uri );
   ws.onmessage = function (event) { // add incoming message and scroll chat-panel to bottom
-   console.log('message received');
    var chatPanel = document.getElementById("chat-panel");
    try {
      var p_message_json = JSON.parse( event.data );
@@ -206,23 +205,22 @@ if ("WebSocket" in window) {
      if (message_json.message )
      {
       var locale = window.navigator.userLanguage || window.navigator.language;
-      var local_time_string = new Date( message_json.dateTime + 'Z' ).toLocaleTimeString( locale,  { hour: 'numeric',minute: 'numeric'} );
+      var local_time_string = new Date( message_json.dateTime + 'Z' ).toLocaleTimeString( locale, { hour: 'numeric',minute: 'numeric'} );
        if ( message_json.username === username )
        { // Our message coming back through websocket
-        chatPanel.innerHTML += '<div class="chat-container"><p>' +  message_json.message  + '</p><span class="time-right">' + local_time_string  + '</span></div>';
+        chatPanel.innerHTML += '<div class="chat-container"><p>' + message_json.message + '</p><span class="time-right">' + local_time_string + '</span></div>';
        }
        else
        { // Someone elses message coming in through websocket
-        chatPanel.innerHTML += '<div class="chat-container darker"><span class="right">' + message_json.username +   ' says:</span><hr/><p>' +  message_json.message  + '</p><span class="time-left">' + local_time_string  + '</span></div>';
+        chatPanel.innerHTML += '<div class="chat-container darker"><span class="right">' + message_json.username + ' says:</span><hr/><p>' + message_json.message + '</p><span class="time-left">' + local_time_string + '</span></div>';
        }
       chatPanel.scrollTop = chatPanel.scrollHeight;
      }
    } catch {
      console.log(event.data + ' was not parsable as a subscribed message payload');
    }
-   // console.log(event);
  };
- ws.onclose = function() {   // websocket is closed.
+ ws.onclose = function() {
   alert("Connection is closed...");
  };
  ws.onopen = function (event) {
@@ -233,5 +231,5 @@ if ("WebSocket" in window) {
   alert('WebSockets not supported by this browser');
 }
 function send_message() { // called when button pressed
-  send_message_graphql( document.getElementById("chat-text").value  );
+  send_message_graphql( document.getElementById("chat-text").value );
 }
