@@ -186,52 +186,49 @@ function send_message_graphql(msg) {
   });
 }
 send_message_graphql(username + ' has joined');
-// WEBSOCKET
 var ws = null;
 const ignore_types = {
   ka: 1,
   connection_ack: 1,
 };
+function message_html(msg, is_me) {
+  var locale = window.navigator.userLanguage || window.navigator.language;
+  var local_time_string = new Date( msg.dateTime + 'Z' ).toLocaleTimeString( locale, { hour: 'numeric',minute: 'numeric'} );
+  var html = '';
+  html += '<div class="chat-container';
+  if (is_me) html += ' darker';
+  html += '"><span class="right">' + msg.username + ' says:</span><hr/><p>' + msg.message + '</p>';
+  html += '<span class="time-right">' + local_time_string + '</span></div>';
+  return html;
+}
 if ("WebSocket" in window) {
   var loc = window.location, new_uri;
   if (loc.protocol === "https:") {
-      new_uri = "wss:";
+    new_uri = "wss:";
   } else {
-      new_uri = "ws:";
+    new_uri = "ws:";
   }
   new_uri += "//" + loc.host + "/graphql";
   ws = new WebSocket( new_uri );
   ws.onmessage = function (event) { // add incoming message and scroll chat-panel to bottom
-   var chatPanel = document.getElementById("chat-panel");
-   try {
-     var p_message_json = JSON.parse( event.data );
-     if (ignore_types[p_message_json.type]) return;
-     var message_json = p_message_json.payload.data.subscribe;
-     if (message_json.message )
-     {
-      var locale = window.navigator.userLanguage || window.navigator.language;
-      var local_time_string = new Date( message_json.dateTime + 'Z' ).toLocaleTimeString( locale, { hour: 'numeric',minute: 'numeric'} );
-       if ( message_json.username === username )
-       { // Our message coming back through websocket
-        chatPanel.innerHTML += '<div class="chat-container"><p>' + message_json.message + '</p><span class="time-right">' + local_time_string + '</span></div>';
-       }
-       else
-       { // Someone elses message coming in through websocket
-        chatPanel.innerHTML += '<div class="chat-container darker"><span class="right">' + message_json.username + ' says:</span><hr/><p>' + message_json.message + '</p><span class="time-left">' + local_time_string + '</span></div>';
-       }
+    var chatPanel = document.getElementById("chat-panel");
+    try {
+      var p_message_json = JSON.parse( event.data );
+      if (ignore_types[p_message_json.type]) return;
+      var message_json = p_message_json.payload.data.subscribe;
+      chatPanel.innerHTML += message_html(message_json, message_json.username === username);
       chatPanel.scrollTop = chatPanel.scrollHeight;
-     }
-   } catch {
-     console.log(event.data + ' was not parsable as a subscribed message payload');
-   }
- };
- ws.onclose = function() {
-  alert("Connection is closed...");
- };
- ws.onopen = function (event) {
-   ws.send( '{"type":"connection_init","payload":{}}' );
-   ws.send( '{"id":"1","type":"start","payload":{"query":"subscription s {subscribe(channels: [\\"starter\\"]){message username dateTime}}","variables":null,"operationName":"s"}}' );
- };
+    } catch(e) {
+      console.error(event.data + ' was not parsable as a subscribed message payload', e);
+    }
+  };
+  ws.onclose = function() {
+    alert("Connection is closed...");
+  };
+  ws.onopen = function (event) {
+    ws.send( '{"type":"connection_init","payload":{}}' );
+    ws.send( '{"id":"1","type":"start","payload":{"query":"subscription s {subscribe(channels: [\\"starter\\"]){message username dateTime}}","variables":null,"operationName":"s"}}' );
+  };
 } else {
   alert('WebSockets not supported by this browser');
 }
