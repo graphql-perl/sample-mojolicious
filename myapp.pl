@@ -188,6 +188,10 @@ function send_message_graphql(msg) {
 send_message_graphql(username + ' has joined');
 // WEBSOCKET
 var ws = null;
+const ignore_types = {
+  ka: 1,
+  connection_ack: 1,
+};
 if ("WebSocket" in window) {
   var loc = window.location, new_uri;
   if (loc.protocol === "https:") {
@@ -201,6 +205,7 @@ if ("WebSocket" in window) {
    var chatPanel = document.getElementById("chat-panel");
    try {
      var p_message_json = JSON.parse( event.data );
+     if (ignore_types[p_message_json.type]) return;
      var message_json = p_message_json.payload.data.subscribe;
      if (message_json.message )
      {
