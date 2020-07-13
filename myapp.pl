@@ -177,6 +177,7 @@ html, body {
 @@ chat.js
 var username = document.getElementById("username").innerHTML;
 var channel  = document.getElementById("channel").innerHTML;
+document.getElementById("chat-text").focus();
 function send_message_graphql(msg) {
   fetch( '/graphql?', {
     "headers": {
@@ -251,4 +252,5 @@ if ("WebSocket" in window) {
 function send_message(elt) {
   send_message_graphql( elt.value );
   elt.value = '';
+  elt.focus();
 }
