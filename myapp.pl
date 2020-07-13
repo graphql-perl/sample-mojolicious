@@ -163,7 +163,10 @@ html, body {
     <div class="row">
       <div class="column"></div>
       <div class="column">
-        <input type="text" id="chat-text" name="chat-text" size=40><button id='send-message' onClick="send_message()">Send Message</button>
+        <form onsubmit="send_message(this.children[0]); return false">
+          <input type="text" id="chat-text" name="chat-text" size=40>
+          <input type="submit" value="Send Message">
+        </form>
       </div>
     </div>
     </div>
@@ -245,6 +248,7 @@ if ("WebSocket" in window) {
 } else {
   alert('WebSockets not supported by this browser');
 }
-function send_message() { // called when button pressed
-  send_message_graphql( document.getElementById("chat-text").value );
+function send_message(elt) {
+  send_message_graphql( elt.value );
+  elt.value = '';
 }
