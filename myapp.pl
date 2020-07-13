@@ -51,7 +51,8 @@ __DATA__
     <p>To use the demo, try these queries:</p>
     <p><code>
       query q {status}<br>
-      mutation m {publish(input: { username: "u1", message: "m1", channel: "starter"})}<br>
+      mutation m($u: String!, $m: String!, $c: String!) {publish(input: { username: $u, message: $m, channel: $c})}<br>
+      # put this in "Query Variables" pane: {"u": "u1", "m": "m1", "c": "starter"}<br>
       subscription s {subscribe(channels: ["starter"]) {channel username dateTime message}}
     </code></p>
     <p>in the left hand pane in GraphiQL, then run your query using the button at the top.</p>
@@ -180,8 +181,8 @@ function send_message_graphql(msg) {
       "content-type": "application/json",
     },
     "body": JSON.stringify({
-      "query":"mutation m {publish(input: { username: \"" + username + "\", message: \"" + msg + "\", channel: \"" + channel + "\"})}",
-      "variables":null,
+      "query":"mutation m($u: String!, $m: String!, $c: String!) {publish(input: { username: $u, message: $m, channel: $c})}",
+      "variables": { u: username, m: msg, c: channel },
       "operationName":"m",
     }),
     "method": "POST",
