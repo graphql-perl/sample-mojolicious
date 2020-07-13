@@ -171,6 +171,7 @@ html, body {
     </div>
     </div>
   </div>
+  <script src="//unpkg.com/subscriptions-transport-ws@0.9.16/browser/client.js"></script>
   <script src="chat.js"></script>
 </html>
 
@@ -179,6 +180,7 @@ var username = document.getElementById("username").innerHTML;
 var channel  = document.getElementById("channel").innerHTML;
 var websocket_uri = window.location.protocol === "https:" ? "ws" : "w";
 websocket_uri += "s://" + window.location.host + "/graphql";
+var chatPanel = document.getElementById("chat-panel");
 document.getElementById("chat-text").focus();
 function send_message_graphql(msg) {
   fetch( '/graphql?', {
@@ -197,11 +199,6 @@ function send_message_graphql(msg) {
   });
 }
 send_message_graphql(username + ' has joined');
-var ws = null;
-const ignore_types = {
-  ka: 1,
-  connection_ack: 1,
-};
 function message_html(msg, is_me) {
   var locale = window.navigator.userLanguage || window.navigator.language;
   var local_time_string = new Date( msg.dateTime + 'Z' ).toLocaleTimeString( locale, { hour: 'numeric',minute: 'numeric'} );
@@ -213,34 +210,22 @@ function message_html(msg, is_me) {
   return html;
 }
 if ("WebSocket" in window) {
-  ws = new WebSocket( websocket_uri );
-  ws.onmessage = function (event) { // add incoming message and scroll chat-panel to bottom
-    var chatPanel = document.getElementById("chat-panel");
-    try {
-      var p_message_json = JSON.parse( event.data );
-      if (ignore_types[p_message_json.type]) return;
-      var message_json = p_message_json.payload.data.subscribe;
+  const subscriptionsClient = new window.SubscriptionsTransportWs.SubscriptionClient(websocket_uri, {
+    lazy: true, // not in original
+    reconnect: true
+  });
+  subscriptionsClient.request({
+    "query":"subscription s($c: [String!]) {subscribe(channels: $c) {channel username dateTime message}}",
+    "variables": { c: channel },
+  }).subscribe({
+    next(payload) {
+console.log('payload', payload);
+      var message_json = payload.data.subscribe;
       chatPanel.innerHTML += message_html(message_json, message_json.username === username);
       chatPanel.scrollTop = chatPanel.scrollHeight;
-    } catch(e) {
-      console.error(event.data + ' was not parsable as a subscribed message payload', e);
-    }
-  };
-  ws.onclose = function() {
-    alert("Connection is closed...");
-  };
-  ws.onopen = function (event) {
-    ws.send( JSON.stringify({"type":"connection_init","payload":{}}) );
-    ws.send( JSON.stringify({
-      "id":"1",
-      "type":"start",
-      "payload":{
-        "query":"subscription s($c: [String!]) {subscribe(channels: $c) {channel username dateTime message}}",
-        "variables": { c: channel },
-        "operationName":"s",
-      },
-    }) );
-  };
+    },
+    error(err) { console.error('err', err); },
+  });
 } else {
   alert('WebSockets not supported by this browser');
 }
