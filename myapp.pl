@@ -164,8 +164,8 @@ html, body {
       <div class="column"></div>
       <div class="column">
         <form onsubmit="send_message(this.children[0]); return false">
-          <input type="text" id="chat-text" name="chat-text" size=40>
-          <input type="submit" value="Send Message">
+          <input type="text" id="chat-text" name="chat-text" size=40 autocomplete="off"/>
+          <input type="submit" value="Send Message"/>
         </form>
       </div>
     </div>
