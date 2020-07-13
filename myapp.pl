@@ -53,7 +53,7 @@ __DATA__
       query q {status}<br>
       mutation m($u: String!, $m: String!, $c: String!) {publish(input: { username: $u, message: $m, channel: $c})}<br>
       # put this in "Query Variables" pane: {"u": "u1", "m": "m1", "c": "starter"}<br>
-      subscription s {subscribe(channels: ["starter"]) {channel username dateTime message}}
+      subscription s($c: [String!]) {subscribe(channels: $c) {channel username dateTime message}}
     </code></p>
     <p>in the left hand pane in GraphiQL, then run your query using the button at the top.</p>
     <p>Results are displayed in the pane to the right.</p>
@@ -236,8 +236,8 @@ if ("WebSocket" in window) {
       "id":"1",
       "type":"start",
       "payload":{
-        "query":"subscription s {subscribe(channels: [\"starter\"]){message username dateTime}}",
-        "variables":null,
+        "query":"subscription s($c: [String!]) {subscribe(channels: $c) {channel username dateTime message}}",
+        "variables": { c: channel },
         "operationName":"s",
       },
     }) );
