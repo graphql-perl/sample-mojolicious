@@ -178,24 +178,24 @@ html, body {
 @@ chat.js
 var username = document.getElementById("username").innerHTML;
 var channel  = document.getElementById("channel").innerHTML;
+var graphql_uri = '/graphql';
 var websocket_uri = window.location.protocol === "https:" ? "ws" : "w";
-websocket_uri += "s://" + window.location.host + "/graphql";
+websocket_uri += "s://" + window.location.host + graphql_uri;
 var chatPanel = document.getElementById("chat-panel");
 document.getElementById("chat-text").focus();
 function send_message_graphql(msg) {
-  fetch( '/graphql?', {
-    "headers": {
+  return fetch( graphql_uri, {
+    method: "POST",
+    headers: {
       "accept": "application/json",
       "content-type": "application/json",
     },
-    "body": JSON.stringify({
-      "query":"mutation m($u: String!, $m: String!, $c: String!) {publish(input: { username: $u, message: $m, channel: $c})}",
-      "variables": { u: username, m: msg, c: channel },
-      "operationName":"m",
+    body: JSON.stringify({
+      query: "mutation m($u: String!, $m: String!, $c: String!) {publish(input: { username: $u, message: $m, channel: $c})}",
+      variables: { u: username, m: msg, c: channel },
+      operationName: "m",
     }),
-    "method": "POST",
-    "mode": "cors",
-    "credentials": "omit"
+    credentials: "include"
   });
 }
 send_message_graphql(username + ' has joined');
@@ -219,7 +219,6 @@ if ("WebSocket" in window) {
     "variables": { c: channel },
   }).subscribe({
     next(payload) {
-console.log('payload', payload);
       var message_json = payload.data.subscribe;
       chatPanel.innerHTML += message_html(message_json, message_json.username === username);
       chatPanel.scrollTop = chatPanel.scrollHeight;
