@@ -179,7 +179,11 @@ function send_message_graphql(msg) {
       "accept": "application/json",
       "content-type": "application/json",
     },
-    "body": '{"query":"mutation m {publish(input: { username: \\"' + username + '\\", message: \\"' + msg + '\\", channel: \\"' + channel + '\\"})}","variables":null,"operationName":"m"}',
+    "body": JSON.stringify({
+      "query":"mutation m {publish(input: { username: \"" + username + "\", message: \"" + msg + "\", channel: \"" + channel + "\"})}",
+      "variables":null,
+      "operationName":"m",
+    }),
     "method": "POST",
     "mode": "cors",
     "credentials": "omit"
@@ -226,8 +230,16 @@ if ("WebSocket" in window) {
     alert("Connection is closed...");
   };
   ws.onopen = function (event) {
-    ws.send( '{"type":"connection_init","payload":{}}' );
-    ws.send( '{"id":"1","type":"start","payload":{"query":"subscription s {subscribe(channels: [\\"starter\\"]){message username dateTime}}","variables":null,"operationName":"s"}}' );
+    ws.send( JSON.stringify({"type":"connection_init","payload":{}}) );
+    ws.send( JSON.stringify({
+      "id":"1",
+      "type":"start",
+      "payload":{
+        "query":"subscription s {subscribe(channels: [\"starter\"]){message username dateTime}}",
+        "variables":null,
+        "operationName":"s",
+      },
+    }) );
   };
 } else {
   alert('WebSockets not supported by this browser');
