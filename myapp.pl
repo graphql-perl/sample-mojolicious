@@ -177,6 +177,8 @@ html, body {
 @@ chat.js
 var username = document.getElementById("username").innerHTML;
 var channel  = document.getElementById("channel").innerHTML;
+var websocket_uri = window.location.protocol === "https:" ? "ws" : "w";
+websocket_uri += "s://" + window.location.host + "/graphql";
 document.getElementById("chat-text").focus();
 function send_message_graphql(msg) {
   fetch( '/graphql?', {
@@ -211,14 +213,7 @@ function message_html(msg, is_me) {
   return html;
 }
 if ("WebSocket" in window) {
-  var loc = window.location, new_uri;
-  if (loc.protocol === "https:") {
-    new_uri = "wss:";
-  } else {
-    new_uri = "ws:";
-  }
-  new_uri += "//" + loc.host + "/graphql";
-  ws = new WebSocket( new_uri );
+  ws = new WebSocket( websocket_uri );
   ws.onmessage = function (event) { // add incoming message and scroll chat-panel to bottom
     var chatPanel = document.getElementById("chat-panel");
     try {
