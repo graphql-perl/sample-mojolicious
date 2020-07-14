@@ -2,7 +2,8 @@
 
 This is a demonstration of using Mojolicious to serve GraphQL, using
 [GraphQL::Plugin::Convert::MojoPubSub](https://metacpan.org/pod/GraphQL::Plugin::Convert::MojoPubSub)
-to make a schema. The schema includes a working subscription.
+to make a schema. The schema includes a working subscription, and
+implements a working real-time chat system.
 
 ### To use:
 
